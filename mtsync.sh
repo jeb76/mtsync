@@ -1,18 +1,7 @@
 #!/bin/bash
-# Descarga y compara configuraciones de 2 routers Mikrotik
+# Synchronize configs between Mikrotik routers
 # Variables
-IPMTMAIN="172.31.255.2"
-IPMTBKP="172.31.255.2"
-SSHPORT="22"
-ADMINUSER="admin"
-ADMINPASS=""
-FTPUSER="ftp"
-FTPPASS=""
-TEMPDIR="/root/scripts/mtsync/tmp"
-EXPORTFILEMTMAIN="export_mtmain.rsc"
-EXPORTFILEMTBKP="export_mtbkp.rsc"
-LOGDIR="/root/scripts/mtsync/log"
-LOGFILE="$LOGDIR/$0.log"
+
 
 # Fin variables
 
