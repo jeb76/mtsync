@@ -120,7 +120,7 @@ if [ -s "$TEMPDIR/modules_mtmain.tmp" ]
 			MODULEEXPORT=$(echo $MODULE |sed -e 's/\///g' -e 's/\s/_/g' -e 's/$/.auto.rsc/g')
 			awk 'f && /^\//{exit} /^\'"$MODULE"'/{f=1} f' $IMPORTDIR/$EXPORTFILEMTMAIN.rsc >$TEMPDIR/$MODULEMTMAIN
 			awk 'f && /^\//{exit} /^\'"$MODULE"'/{f=1} f' $IMPORTDIR/$EXPORTFILEMTBKP.rsc >$TEMPDIR/$MODULEMTBKP
-			yes "1" |sdiff -sa $TEMPDIR/$MODULEMTMAIN $TEMPDIR/$MODULEMTBKP -o $MODULEEXPORT
+			yes "1" |sdiff -sa $TEMPDIR/$MODULEMTMAIN $TEMPDIR/$MODULEMTBKP -o $EXPORTDIR/$MODULEEXPORT
 			echo ""
 			sleep 2s
 		done <$TEMPDIR/modules_mtmain.tmp
