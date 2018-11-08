@@ -3,7 +3,8 @@
 #
 # Local variables
 LIGHTRED='\033[1;31m'
-LIGHTGREEN='\033[1;32m'
+LIGHTGREEN='\033[1;91m'
+LIGHTYELLOW='\033[1;93m'
 NC='\033[0m' #No color
 CONFIGFILE=./mtsync.conf
 
@@ -110,19 +111,27 @@ fi
 
 # For every module (Block of export script) of mt main compare with every module of mt main and generate an export file
 # with differences
-
-## Solucionar problema con sdiff
 if [ -s "$TEMPDIR/modules_mtmain.tmp" ]
 	then
 		while read MODULE; do
-			MODULEMTMAIN=$(echo $MODULE |sed -e 's/\///g' -e 's/\s/_/g' -e 's/$/_mtmain.rsc/g')
-			MODULEMTBKP=$(echo $MODULE |sed -e 's/\///g' -e 's/\s/_/g' -e 's/$/_mtbkp.rsc/g')
-			MODULEEXPORT=$(echo $MODULE |sed -e 's/\///g' -e 's/\s/_/g' -e 's/$/.auto.rsc/g')
+			MODULEMTMAIN=$(echo $MODULE |sed -e 's/\///g' -e 's/\s/_/g' -e 's/_$/_mtmain.rsc/g')
+			MODULEMTBKP=$(echo $MODULE |sed -e 's/\///g' -e 's/\s/_/g' -e 's/_$/_mtbkp.rsc/g')
 			awk 'f && /^\//{exit} /^\'"$MODULE"'/{f=1} f' $IMPORTDIR/$EXPORTFILEMTMAIN.rsc >$TEMPDIR/$MODULEMTMAIN
 			awk 'f && /^\//{exit} /^\'"$MODULE"'/{f=1} f' $IMPORTDIR/$EXPORTFILEMTBKP.rsc >$TEMPDIR/$MODULEMTBKP
-			yes "1" |sdiff -sa $TEMPDIR/$MODULEMTMAIN $TEMPDIR/$MODULEMTBKP -o $EXPORTDIR/$MODULEEXPORT
-			echo ""
-			sleep 2s
+			# If grep outputs some string, then MODULEMTMAIN is not equal to MODULEMTBKP
+			# Sanitize MODULE string
+			MODULE="${MODULE/$'\r'/}"
+			if [[ $(grep -Fxvf $TEMPDIR/$MODULEMTMAIN $TEMPDIR/$MODULEMTBKP) ]]
+				then
+					echo "Some differences in module $MODULE..."
+					echo "Exporting module to file..."
+## Ver algoritmo para devolver export con set y no con add en los modulos que no se pueden eliminar (Solo se pueden editar)
+## En test.sh hay una aproximacion
+					cat $TEMPDIR/$MODULEMTMAIN >>$EXPORTDIR/update.auto.rsc
+				else
+					echo "No differences in module $MODULE..."
+			fi
+			sleep 1s
 		done <$TEMPDIR/modules_mtmain.tmp
 fi
 
