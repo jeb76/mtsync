@@ -69,11 +69,11 @@ fi
 ##### Default mode #####
 
 # Connection and export creation
-#sshpass -p $ADMINPASS ssh $ADMINUSER@$IPMTMAIN -p $SSHPORT -o StrictHostKeyChecking=no "/export compact file=$EXPORTFILEMTMAIN" 2>&1 |tee -a $LOGFILE
+sshpass -p $ADMINPASS ssh $ADMINUSER@$IPMTMAIN -p $SSHPORT -o StrictHostKeyChecking=no "/export compact file=$EXPORTFILEMTMAIN" 2>&1 |tee -a $LOGFILE
 #sshpass -p $ADMINPASS ssh $ADMINUSER@$IPMTMAIN -p $SSHPORT -o StrictHostKeyChecking=no "/export compact file=$EXPORTFILEMTBKP" 2>&1 |tee -a $LOGFILE
 
 # Download export via ftp
-#wget -N -nv -P $IMPORTDIR/ ftp://$IPMTMAIN:$FTPPORT/$EXPORTFILEMTMAIN.rsc --ftp-user=$FTPUSER --ftp-password=$FTPPASS 2>&1 |tee -a $LOGFILE
+wget -N -nv -P $IMPORTDIR/ ftp://$IPMTMAIN:$FTPPORT/$EXPORTFILEMTMAIN.rsc --ftp-user=$FTPUSER --ftp-password=$FTPPASS 2>&1 |tee -a $LOGFILE
 #wget -N -nv -P $IMPORTDIR/ ftp://$IPMTMAIN:$FTPPORT/$EXPORTFILEMTBKP.rsc --ftp-user=$FTPUSER --ftp-password=$FTPPASS 2>&1 |tee -a $LOGFILE
 
 ### Exports comparison
@@ -125,16 +125,17 @@ if [ -s "$TEMPDIR/modules_mtmain.tmp" ]
 				then
 					echo "Some differences in module $MODULE..."
 					echo "Exporting module to file..."
-## Ver algoritmo para devolver export con set y no con add en los modulos que no se pueden eliminar (Solo se pueden editar)
-## En test.sh hay una aproximacion
-					cat $TEMPDIR/$MODULEMTMAIN >>$EXPORTDIR/update.auto.rsc
+					export EXPORTDIR
+					export TEMPDIR
+					export MODULE
+					export MODULEMTMAIN
+					export MODULEMTBKP
+					./module_comp.sh
 				else
 					echo "No differences in module $MODULE..."
 			fi
 			sleep 1s
 		done <$TEMPDIR/modules_mtmain.tmp
 fi
-
-#awk "f && /^\//{exit} /^\/interface bridge/{f=1} f" $EXPORTFILEMTMAIN.rsc
 
 exit 0
